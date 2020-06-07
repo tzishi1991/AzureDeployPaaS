@@ -58,18 +58,13 @@
             "metadata": {
                 "description": "Location for all resources."
                 }
-        },
-        "keyVaultTags": {
-            "type": "object",
-            "defaultValue": {}
-            }
+        }
         },
         "resources": [{
             "type": "Microsoft.KeyVault/vaults",
             "name": "[parameters('keyVaultName')]",
             "apiVersion": "2016-10-01",
             "location": "[parameters('location')]",
-            "tags": "[parameters('keyVaultTags')]",
             "properties": {
                 "enabledForDeployment": "[parameters('enableVaultForDeployment')]",
                 "enabledForDiskEncryption": "[parameters('enableVaultForDiskEncryption')]",
