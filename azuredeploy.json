@@ -1,0 +1,213 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "templateStoreBaseUri": {
+      "type": "string",
+      "metadata": {
+        "description": "The URL that linked ARM templates are hosted at."
+      }
+    },
+    "templateStoreSasToken": {
+      "type": "string",
+      "metadata": {
+        "description": "The SAS token used to access the storage account that linked ARM templates are stored in."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "The location resources will be deployed to."
+      }
+    },
+    "logicAppName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the logic app that will be deployed."
+      }
+    },
+    "azureStorageAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the storage account that will be deployed to be used by the logic app."
+      }
+    },
+    "azureStorageAccountDisplayName": {
+      "type": "string",
+      "metadata": {
+        "description": "The display name of the storage account that will be deployed to be used by the logic app."
+      }
+    },
+    "azureBlogStorageContainerName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the storage account container that will be deployed to be used by the logic app."
+      }
+    },
+
+    "sqlServerName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the SQL server that will be deployed."
+      }
+    },
+    "sqlDatabaseName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the SQL database that will be deployed."
+      }
+    },
+    "sqlServerAdministratorLogin": {
+      "type": "string",
+      "metadata": {
+        "description": "The SQL server username that will be configured as admin on the SQL Server."
+      }
+    },
+    "sqlServerAdministratorLoginPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password to the SQL server account that will be configured as admin on the SQL Server."
+      }
+    },
+    "sqlDatabaseEdition": {
+      "type": "string",
+      "metadata": {
+        "description": "The edition of the SQL database that will be created."
+      }
+    },
+    "sqlDatabaseServiceObjectiveName": {
+      "type": "string",
+      "metadata": {
+        "description": "The service objective of the SQL database that will be created."
+      }
+    },
+    "deploymentAccountObjectId": {
+      "type": "string",
+      "metadata": {
+        "description": "The object id of the deployment account used by Azure DevOps."
+      }
+    }
+  },
+    "variables": {
+      "storageAccountTemplateUri": "[concat(parameters('templateStoreBaseUri'), 'resources/storageAccount.json', parameters('templateStoreSasToken'))]",
+      "logicAppTemplateUri": "[concat(parameters('templateStoreBaseUri'), 'resources/logicApp.json', parameters('templateStoreSasToken'))]",
+      "keyVaultTemplateUri": "[concat(parameters('templateStoreBaseUri'), 'resources/keyVault.json', parameters('templateStoreSasToken'))]",
+      "sqlDatabaseTemplateUri": "[concat(parameters('templateStoreBaseUri'), 'resources/sqlDatabase.json', parameters('templateStoreSasToken'))]",
+      "sqlServerTemplateUri": "[concat(parameters('templateStoreBaseUri'), 'resources/sqlServer.json', parameters('templateStoreSasToken'))]"
+    },
+    "resources": [
+      {
+        "apiVersion": "2017-05-10",
+        "name": "functionApp",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+          "mode": "incremental",
+          "templateLink": {
+            "uri": "[variables('logicAppTemplateUri')]",
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "logicAppName": {
+              "value": "[parameters('logicAppName')]"
+            },
+            "azureStorageAccountName": {
+              "value": "[parameters('azureStorageAccountName')]"
+            },
+            "azureStorageAccountDisplayName": {
+              "value": "[parameters('azureStorageAccountDisplayName')]"
+            },
+            "azureBlogStorageContainerName": {
+              "value": "[parameters('azureBlogStorageContainerName')]"
+            },
+            "location": {
+              "value": "[parameters('location')]"
+            }
+          }
+        }
+      },
+      {
+        "apiVersion": "2017-05-10",
+        "name": "sqlServer",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+          "mode": "incremental",
+          "templateLink": {
+            "uri": "[variables('sqlServerTemplateUri')]",
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "sqlServerName": {
+              "value": "[parameters('sqlServerName')]"
+            },
+            "sqlServerLocation": {
+              "value": "[parameters('location')]"
+            },
+            "sqlAdministratorLogin": {
+              "value": "[parameters('sqlServerAdministratorLogin')]"
+            },
+            "sqlAdministratorLoginPassword": {
+              "value": "[parameters('sqlServerAdministratorLoginPassword')]"
+            }
+          }
+        }
+      },
+      {
+        "apiVersion": "2017-05-10",
+        "name": "sqlDatabase",
+        "type": "Microsoft.Resources/deployments",
+        "dependsOn": [
+          "sqlServer"
+        ],
+        "properties": {
+          "mode": "incremental",
+          "templateLink": {
+            "uri": "[variables('sqlDatabaseTemplateUri')]",
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "sqlDatabaseName": {
+              "value": "[parameters('sqlDatabaseName')]"
+            },
+            "sqlDatabaseLocation": {
+              "value": "[parameters('location')]"
+            },
+            "sqlServerName": {
+              "value": "[parameters('sqlServerName')]"
+            },
+            "sqlDatabaseEdition": {
+              "value": "[parameters('sqlDatabaseEdition')]"
+            },
+            "sqlDatabaseServiceObjectiveName": {
+              "value": "[parameters('sqlDatabaseServiceObjectiveName')]"
+            }
+          }
+        }
+      }
+      {
+        "apiVersion": "2017-05-10",
+        "name": "sqlDatabase",
+        "type": "Microsoft.Resources/deployments",
+        "dependsOn": [
+          "sqlServer"
+        ],
+        "properties": {
+          "mode": "incremental",
+          "templateLink": {
+            "uri": "[variables('storageAccountTemplateUri')]",
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "storageAccountName": {
+              "value": "[parameters('azureStorageAccountName')]"
+            },
+            "containerName": {
+              "value": "[parameters('azureStorageAccountDisplayName')]"
+            },
+            }
+          }
+        }
+      }
+    ],
+    "outputs": {}
+  }
