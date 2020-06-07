@@ -21,6 +21,12 @@
         "description": "The location resources will be deployed to."
       }
     },
+    "storageAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the storage account that will be deployed to be used by the logic app."
+      }
+    },
     "logicAppName": {
       "type": "string",
       "metadata": {
@@ -82,43 +88,34 @@
         "description": "The service objective of the SQL database that will be created."
       }
     },
-    "deploymentAccountObjectId": {
+    "linkedTemplateUri": {
       "type": "string",
       "metadata": {
-        "description": "The object id of the deployment account used by Azure DevOps."
+        "description": "The Uri of the linked template."
       }
     }
   },
-    "variables": {
-      "storageAccountTemplateUri": "[concat(parameters('templateStoreBaseUri'), 'resources/storageAccount.json', parameters('templateStoreSasToken'))]",
-      "logicAppTemplateUri": "[concat(parameters('templateStoreBaseUri'), 'resources/logicApp.json', parameters('templateStoreSasToken'))]",
-      "keyVaultTemplateUri": "[concat(parameters('templateStoreBaseUri'), 'resources/keyVault.json', parameters('templateStoreSasToken'))]",
-      "sqlDatabaseTemplateUri": "[concat(parameters('templateStoreBaseUri'), 'resources/sqlDatabase.json', parameters('templateStoreSasToken'))]",
-      "sqlServerTemplateUri": "[concat(parameters('templateStoreBaseUri'), 'resources/sqlServer.json', parameters('templateStoreSasToken'))]"
-    },
-    "resources": [
+  "variables": {
+    "storageAccountTemplateUri": "[concat(parameters('templateStoreBaseUri'), 'resources/storageAccount.json', parameters('templateStoreSasToken'))]",
+    "logicAppTemplateUri": "[concat(parameters('templateStoreBaseUri'), 'resources/logicApp.json', parameters('templateStoreSasToken'))]",
+    "keyVaultTemplateUri": "[concat(parameters('templateStoreBaseUri'), 'resources/keyVault.json', parameters('templateStoreSasToken'))]",
+    "sqlDatabaseTemplateUri": "[concat(parameters('templateStoreBaseUri'), 'resources/sqlDatabase.json', parameters('templateStoreSasToken'))]",
+    "sqlServerTemplateUri": "[concat(parameters('templateStoreBaseUri'), 'resources/sqlServer.json', parameters('templateStoreSasToken'))]"
+  },
+  "resources": [
+    {
       {
-        "apiVersion": "2017-05-10",
-        "name": "functionApp",
+        "name": "linkedTemplate",
         "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2018-05-01",
         "properties": {
-          "mode": "incremental",
+          "mode": "Incremental",
           "templateLink": {
-            "uri": "[variables('logicAppTemplateUri')]",
-            "contentVersion": "1.0.0.0"
+            "uri": "[parameters('linkedTemplateUri')]"
           },
           "parameters": {
-            "logicAppName": {
-              "value": "[parameters('logicAppName')]"
-            },
-            "azureStorageAccountName": {
-              "value": "[parameters('azureStorageAccountName')]"
-            },
-            "azureStorageAccountDisplayName": {
-              "value": "[parameters('azureStorageAccountDisplayName')]"
-            },
-            "azureBlogStorageContainerName": {
-              "value": "[parameters('azureBlogStorageContainerName')]"
+            "storageAccountName": {
+              "value": "[parameters('storageAccountName')]"
             },
             "location": {
               "value": "[parameters('location')]"
@@ -183,10 +180,11 @@
             }
           }
         }
-      }
+      },
+
       {
         "apiVersion": "2017-05-10",
-        "name": "sqlDatabase",
+        "name": "storageAccount",
         "type": "Microsoft.Resources/deployments",
         "dependsOn": [
           "sqlServer"
@@ -203,11 +201,45 @@
             },
             "containerName": {
               "value": "[parameters('azureStorageAccountDisplayName')]"
+            }
+          }
+        }
+      },
+      {
+        "apiVersion": "2017-05-10",
+        "name": "logicApp",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+          "mode": "incremental",
+          "templateLink": {
+            "uri": "[variables('logicAppTemplateUri')]",
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "logicAppName": {
+              "value": "[parameters('logicAppName')]"
             },
+            "azureStorageAccountName": {
+              "value": "[parameters('azureStorageAccountName')]"
+            },
+            "azureStorageAccountDisplayName": {
+              "value": "[parameters('azureStorageAccountDisplayName')]"
+            },
+            "azureBlogStorageContainerName": {
+              "value": "[parameters('azureBlogStorageContainerName')]"
+            },
+            "location": {
+              "value": "[parameters('location')]"
             }
           }
         }
       }
-    ],
-    "outputs": {}
+    }
+  ],
+  "outputs": {
+    "storageEndpoint": {
+      "type": "object",
+      "value": "[reference('linkedTemplate').outputs.storageEndpoint.value]"
+    }
   }
+}

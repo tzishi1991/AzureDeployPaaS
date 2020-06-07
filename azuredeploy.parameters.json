@@ -2,5 +2,41 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "templateStoreBaseUri": {
+      "value": "https://lrrpsadev.blob.core.windows.net/arm/"
+    },
+    "templateStoreSasToken": {
+      "value": "?sv=2019-10-10\u0026ss=bfqt\u0026srt=sco\u0026sp=rwdlacupx\u0026se=2020-06-08T00:40:10Z\u0026st=2020-06-07T16:40:10Z\u0026sip=2.127.127.249\u0026spr=https\u0026sig=tV0eAxREg2yjQta7XehaOJ579FFUMtLaPOg8wLvdUrU%3D"
+    },
+    "logicAppName": {
+      "value": "lrpplawedev"
+    },
+    "azureStorageAccountName": {
+      "value": "lrppsawedev"
+    },
+    "azureStorageAccountDisplayName": {
+      "value": "LandRegistryPricePaidStorageAccountWestEuropeDevelopment"
+    },
+    "azureBlogStorageContainerName": {
+      "value": "lrppsacwedev"
+    },
+    "sqlServerName": {
+      "value": "lrppsswedev"
+    },
+    "sqlDatabaseName": {
+      "value": "lrppdbwedev"
+    },
+    "sqlServerAdministratorLogin": {
+      "value": "tzishi"
+    },
+    "sqlDatabaseEdition": {
+      "value": "Basic"
+    },
+    "sqlDatabaseServiceObjectiveName": {
+      "value": "Basic"
+    },
+    "storageAccountName": {
+      "value": "lrrpsadev"
+    }
   }
 }

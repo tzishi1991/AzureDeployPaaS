@@ -4,10 +4,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.29409.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "LRPP.ARM", "LRPP.ARM.deployproj", "{D08791AC-1AB9-4611-AE8C-703E9E7EF56C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5C544FD7-C12B-43FD-BB07-8BDC270D4C88} = {5C544FD7-C12B-43FD-BB07-8BDC270D4C88}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{A76D928B-494B-414E-9718-0431E6BF0C21}"
 EndProject
-Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "LRPP.LinkedTemplates.StorageAccoint", "..\LRPP.LinkedTemplates.StorageAccoint\LRPP.LinkedTemplates.StorageAccoint.deployproj", "{5C544FD7-C12B-43FD-BB07-8BDC270D4C88}"
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "LRPP.LinkedTemplates.StorageAccount", "..\LRPP.LinkedTemplates.StorageAccoint\LRPP.LinkedTemplates.StorageAccount.deployproj", "{5C544FD7-C12B-43FD-BB07-8BDC270D4C88}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
